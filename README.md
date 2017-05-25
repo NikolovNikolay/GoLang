@@ -1,3 +1,3 @@
 # GoLang
 
-## Some GoLand in me branches
+## Some GoLang in me branches
