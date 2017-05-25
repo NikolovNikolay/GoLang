@@ -29,6 +29,7 @@ func main() {
 }
 
 func fillNameMap(namesArr []string, mapParam map[int][]string) {
+
 	for i := range names {
 
 		n := names[i]
