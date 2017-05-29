@@ -1,3 +1,3 @@
 # GoLang
 
-## Some GoLang in me branches
+## GoLang training tasks and apps
