@@ -27,9 +27,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func TodoIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set(contentType, contentTypeAppJSON)
 	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(DbGetAllTodos()); err != nil {
-		panic(err)
-	}
+	checkForServerError(w, json.NewEncoder(w).Encode(DbGetAllTodos()))
 }
 
 // TodoShow ...
@@ -41,9 +39,7 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.Header().Set(contentType, contentTypeAppJSON)
 		w.WriteHeader(http.StatusBadRequest)
-		if er := json.NewEncoder(w).Encode(err); er != nil {
-			panic(err)
-		}
+		checkForServerError(w, err)
 		return
 	}
 
@@ -56,9 +52,7 @@ func TodoShow(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
-	if err := json.NewEncoder(w).Encode(t); err != nil {
-		panic(err)
-	}
+	checkForServerError(w, json.NewEncoder(w).Encode(t))
 }
 
 // TodoCreate ...
@@ -68,26 +62,26 @@ func TodoCreate(w http.ResponseWriter, r *http.Request) {
 	// First we read all of the sent body and then we continue.
 	// we have to be cautious if someone sends us some big data (the limit here is 1 048 576 bytes)
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
 
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
+	checkError(err)
+	checkError(r.Body.Close())
 
 	if err := json.Unmarshal(body, &todo); err != nil {
 		w.Header().Set(contentType, contentTypeAppJSON)
 		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+		checkForServerError(w, err)
+		return
 	}
 
 	t := RepoCreateTodo(todo)
 	w.Header().Set(contentType, contentTypeAppJSON)
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
-		panic(err)
+
+	checkForServerError(w, json.NewEncoder(w).Encode(t))
+}
+
+func checkForServerError(w http.ResponseWriter, err error) {
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

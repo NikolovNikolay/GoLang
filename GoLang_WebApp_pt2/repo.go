@@ -5,11 +5,6 @@ import "fmt"
 var currentID int
 var todos Todos
 
-func init() {
-	RepoCreateTodo(Todo{Name: "Write presentation"})
-	RepoCreateTodo(Todo{Name: "Host meetup"})
-}
-
 // RepoFindTodo ...
 func RepoFindTodo(id int) Todo {
 	for _, t := range todos {
