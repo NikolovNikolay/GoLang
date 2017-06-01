@@ -13,10 +13,8 @@ const (
 	driverName = "mysql"
 	userName   = "root"
 	password   = "admin"
-	dbName     = "nums" //"go_tasks_prj"
+	dbName     = "go_tasks_prj"
 )
-
-var sqlDB *sql.DB
 
 /*
 Uow - the exported unit of work instance, that
