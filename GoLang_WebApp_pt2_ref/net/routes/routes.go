@@ -1,6 +1,7 @@
-package main
+package routes
 
 import (
+	"exercise/GoLang_WebApp_pt2_ref/net/handlers"
 	"net/http"
 )
 
@@ -20,30 +21,30 @@ var routes = Routes{
 		"Index",
 		"GET",
 		"/",
-		Index,
+		handlers.Index,
 	},
 	Route{
-		"TodoIndex",
+		"TasksIndex",
 		"GET",
-		"/todos",
-		TodoIndex,
+		"/tasks",
+		handlers.TasksIndex,
 	},
 	Route{
-		"TodoShow",
+		"TaskShow",
 		"GET",
-		"/todos/{todoID}",
-		TodoShow,
+		"/tasks/{taskID}",
+		handlers.TaskShow,
 	},
 	Route{
-		"TodoCreate",
+		"TaskCreate",
 		"POST",
-		"/todos",
-		TodoCreate,
+		"/tasks",
+		handlers.TaskCreate,
 	},
 	Route{
-		"TodoDelete",
+		"TaskDelete",
 		"POST",
-		"/todoDelete/{todoID}",
-		TodoDelete,
+		"/taskDelete/{taskID}",
+		handlers.TaskDelete,
 	},
 }
