@@ -9,12 +9,15 @@ type DbTableGen struct {
 }
 
 /*
-SeedScript provides DB table generate script
+PassScript provides DB table generate script
 */
-func (dbt DbTableGen) SeedScript() string {
+func (dbt DbTableGen) PassScript() string {
 	return dbt.Script
 }
 
+/*
+DbName provides the name of the table
+*/
 func (dbt DbTableGen) DbName() string {
 	return dbt.Name
 }

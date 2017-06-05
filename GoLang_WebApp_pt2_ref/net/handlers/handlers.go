@@ -66,16 +66,20 @@ func TaskShow(w http.ResponseWriter, r *http.Request) {
 		checkForServerError(w, err)
 		return
 	}
-	w.Header().Set(contentType, contentTypeAppJSON)
 
 	var finalStatus int
-	if t.Name != "" {
+
+	if t == nil {
+		finalStatus = http.StatusNotFound
+	} else if t.Subject != "" {
 		finalStatus = http.StatusFound
 	} else {
 		finalStatus = http.StatusNotFound
 	}
 
+	w.Header().Set(contentType, contentTypeAppJSON)
 	w.WriteHeader(finalStatus)
+
 	res = &response.Response{
 		Status:  finalStatus,
 		Payload: t,
@@ -134,9 +138,22 @@ func TaskDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.Uow.ProvideTaskrepository().Delete(todoID)
+	afected, err := db.Uow.ProvideTaskrepository().Delete(todoID)
 	if err != nil {
 		checkForServerError(w, err)
+		return
+	}
+
+	if !afected && err == nil {
+		// we assume the record with passed ID does not exist in DB
+		res = &response.Response{
+			Status:  http.StatusNotFound,
+			Payload: nil,
+			Error:   ""}
+
+		w.Header().Set(contentType, contentTypeAppJSON)
+		w.WriteHeader(http.StatusOK)
+		checkForServerError(w, json.NewEncoder(w).Encode(res))
 		return
 	}
 
@@ -148,8 +165,7 @@ func TaskDelete(w http.ResponseWriter, r *http.Request) {
 		Payload: nil,
 		Error:   ""}
 
-	j, err := json.Marshal(res)
-	checkForServerError(w, json.NewEncoder(w).Encode(j))
+	checkForServerError(w, json.NewEncoder(w).Encode(res))
 }
 
 func extractTodoID(r *http.Request) (int64, error) {

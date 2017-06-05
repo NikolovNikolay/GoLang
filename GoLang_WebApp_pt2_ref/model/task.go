@@ -7,7 +7,7 @@ Task represents task object
 */
 type Task struct {
 	ID        int       `json:"id"`
-	Name      string    `json:"name"`
+	Subject   string    `json:"subject"`
 	Completed bool      `json:"completed"`
 	Due       time.Time `json:"due"`
 }

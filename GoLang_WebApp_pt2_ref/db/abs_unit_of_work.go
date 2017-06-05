@@ -1,8 +1,8 @@
 package db
 
 /*
-UnitOfWorkProvider ...
+UnitOfWorkProvider interface provides available repositories
 */
 type UnitOfWorkProvider interface {
-	ProvideTaskrepository() Repositorier
+	ProvideTaskrepository() TaskRepository
 }

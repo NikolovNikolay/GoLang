@@ -33,9 +33,7 @@ func init() {
 	// If ok initialize unit of work
 	uw := InitUnitOfWork(sqlDB)
 
-	/*
-		Creating the tables in DB if needed
-	*/
+	// Creating the tables in DB if needed
 	seeder := NewDbSeeder(uw)
 	seeder.Seed()
 

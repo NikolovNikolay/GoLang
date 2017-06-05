@@ -18,7 +18,7 @@ type TaskRepository struct {
 }
 
 /*
-NewTaskRepo ...
+NewTaskRepo is constructor for Taskrepository
 */
 func NewTaskRepo(db *sql.DB) *TaskRepository {
 	repo := &TaskRepository{
@@ -30,61 +30,72 @@ func NewTaskRepo(db *sql.DB) *TaskRepository {
 /*
 Find a task in DB
 */
-func (tr TaskRepository) Find(id int64) (model.Task, error) {
+func (tr TaskRepository) Find(id int64) (*model.Task, error) {
 	stmt, err := tr.db.Prepare(ConcatQueryWithParams(tables.TableTasks.Consts.PrepareGetByID, id))
 	if helpers.CheckError(err) != nil {
-		return model.Task{}, err
+		return &model.Task{}, err
 	}
 
 	rows, err := stmt.Query()
+
 	if helpers.CheckError(err) != nil {
-		return model.Task{}, err
+		return &model.Task{}, err
 	}
+
+	hasRows := false
 	defer rows.Close()
 
 	t := model.Task{}
+
 	for rows.Next() {
-		err := rows.Scan(&t.ID, &t.Name, &t.Completed, &t.Due)
+		hasRows = true
+		err := rows.Scan(&t.ID, &t.Subject, &t.Completed, &t.Due)
 		if helpers.CheckError(err) != nil {
-			return model.Task{}, err
+			return &model.Task{}, err
 		}
 		break
 	}
-	return t, nil
+
+	if !hasRows {
+		return nil, nil
+	}
+
+	return &t, nil
 }
 
 /*
 Create new Task object
 */
-func (tr TaskRepository) Create(obj interface{}) (model.Task, error) {
+func (tr TaskRepository) Create(obj interface{}) (*model.Task, error) {
+	t := &model.Task{}
 	if obj == nil {
-		return model.Task{}, errors.New("nil passed to create")
+		return t, errors.New("nil passed to create")
 	}
 
 	if _, ok := obj.(model.Task); !ok {
-		return model.Task{}, errors.New("Invalid argument type")
+		return t, errors.New("Invalid argument type")
 	}
 
 	taskToCreate := obj.(model.Task)
 
-	if taskToCreate.Name == "" {
-		return model.Task{}, errors.New("Provide at least task name")
+	if taskToCreate.Subject == "" {
+		return t, errors.New("Provide at least task name")
 	}
 	stmt, err := tr.db.Prepare(tables.TableTasks.Consts.PrepareInsert)
 	if helpers.CheckError(err) != nil {
-		return taskToCreate, err
+		return &taskToCreate, err
 	}
-	res, err := stmt.Exec(taskToCreate.Name)
+	res, err := stmt.Exec(taskToCreate.Subject)
 	if helpers.CheckError(err) != nil {
-		return taskToCreate, err
+		return &taskToCreate, err
 	}
 	insID, err := res.LastInsertId()
 	if helpers.CheckError(err) != nil {
-		return taskToCreate, err
+		return &taskToCreate, err
 	}
 	t, e := tr.Find(insID)
 	if helpers.CheckError(e) != nil {
-		return taskToCreate, e
+		return &taskToCreate, e
 	}
 
 	return t, nil
@@ -98,9 +109,14 @@ func (tr TaskRepository) Delete(id int64) (bool, error) {
 	if helpers.CheckError(err) != nil {
 		return false, err
 	}
-	_, err = stmt.Exec()
+
+	result, err := stmt.Exec()
 	if helpers.CheckError(err) != nil {
 		return false, err
+	}
+
+	if ra, _ := result.RowsAffected(); ra == 0 {
+		return false, nil
 	}
 
 	return true, nil
@@ -114,7 +130,7 @@ func (tr TaskRepository) GetAll() (model.Tasks, error) {
 
 	var (
 		id        int
-		name      string
+		subject   string
 		completed int
 		due       time.Time
 	)
@@ -127,21 +143,21 @@ func (tr TaskRepository) GetAll() (model.Tasks, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&id, &name, &completed, &due)
+		err := rows.Scan(&id, &subject, &completed, &due)
 		if helpers.CheckError(err) != nil {
 			return nil, err
 		}
 
 		// parsing the Todo object
 		newT := model.Task{
-			Name:      name,
+			Subject:   subject,
 			ID:        id,
 			Completed: completed > 1,
 			Due:       due}
 
 		// adding to result collection
 		t = append(t, newT)
-		log.Println(id, name, completed, due)
+		log.Println(id, subject, completed, due)
 	}
 
 	return t, nil

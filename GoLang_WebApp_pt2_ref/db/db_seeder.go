@@ -44,7 +44,7 @@ func (dbs DatabaseSeeder) Seed() {
 	go func() {
 		for _, tab := range dbs.Tables() {
 			if v, ok := tab.(Seedable); ok {
-				_, e := dbs.UnitOfWork.db.Query(v.SeedScript())
+				_, e := dbs.UnitOfWork.db.Query(v.PassScript())
 				if e != nil {
 					fmt.Println(e.Error())
 				} else {

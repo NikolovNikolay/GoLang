@@ -5,7 +5,7 @@ import (
 )
 
 /*
-UnitOfWork ...
+UnitOfWork provides all available repositories
 */
 type UnitOfWork struct {
 	db             *sql.DB
@@ -13,18 +13,17 @@ type UnitOfWork struct {
 }
 
 /*
-InitUnitOfWork ...
+InitUnitOfWork initialized unit of work
 */
 func InitUnitOfWork(d *sql.DB) *UnitOfWork {
 	if Uow == nil {
-		Uow = &UnitOfWork{}
-		Uow.db = d
+		Uow = &UnitOfWork{db: d}
 	}
 	return Uow
 }
 
 /*
-ProvideTaskrepository ...
+ProvideTaskrepository is a getter for tasks repository
 */
 func (uw *UnitOfWork) ProvideTaskrepository() *TaskRepository {
 	if uw.taskRepository == nil {
