@@ -9,7 +9,7 @@
 			"remotePath": "",
 			"port": 2345,
 			"host": "127.0.0.1",
-			"program": "${workspaceRoot}/GoLang_WebApp_pt2_ref/",
+			"program": "${workspaceRoot}/GoLang_Variuos_Tasks/14.fan_in_fan_out/main.go",
 			"env": {},
 			"args": [],
 			"showLog": true
